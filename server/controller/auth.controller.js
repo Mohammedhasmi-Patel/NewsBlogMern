@@ -1,11 +1,12 @@
 import bcryptjs from "bcryptjs";
 import User from "../models/user.model.js";
-export const signup = async (req, res) => {
+import { errorHandler } from "../utils/error.js";
+export const signup = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-      return res.status(400).json({ message: "All fields are required." });
+      return next(errorHandler(400, "All fields are required"));
     }
 
     const existingUser = await User.findOne({
@@ -17,13 +18,11 @@ export const signup = async (req, res) => {
       const isEmailTaken = existingUser.email == email;
 
       if (isUsernameTaken) {
-        return res.status(400).json({ message: "Username is already taken." });
+        return next(errorHandler(400, "Username is already taken."));
       }
 
       if (isEmailTaken) {
-        return res
-          .status(400)
-          .json({ message: "Email is already registered." });
+        return next(errorHandler(400, "Email is already registered."));
       }
     }
 
@@ -38,8 +37,6 @@ export const signup = async (req, res) => {
     return res.status(201).json({ message: "User created successfully." });
   } catch (error) {
     console.error("Signup error:", error);
-    return res
-      .status(500)
-      .json({ message: "Something went wrong. Please try again later." });
+    return next(errorHandler(500, "Internal server error during signup"));
   }
 };
