@@ -52,7 +52,7 @@ const Header = () => {
           </Link>
         </ul>
         <Link to={"sign-in"}>
-          <Button>Sign In</Button>
+          <Button className="cursor-pointer">Sign In</Button>
         </Link>
       </div>
     </header>

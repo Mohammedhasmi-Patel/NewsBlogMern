@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 import toast from "react-hot-toast";
+import GoogleAuth from "@/components/shared/GoogleAuth";
 
 const formSchema = z.object({
   username: z
@@ -147,6 +148,7 @@ const SignUpForm = () => {
               >
                 {loading ? "Creating Account..." : "Submit"}
               </Button>
+              <GoogleAuth />
             </form>
           </Form>
 

@@ -88,3 +88,62 @@ export const signin = async (req, res, next) => {
     return next(errorHandler(500, "Internal server error during signin"));
   }
 };
+
+export const googleauth = async (req, res, next) => {
+  try {
+    const { email, name, profilePhotoUrl } = req.body;
+    const user = await User.findOne({ email });
+
+    if (user) {
+      generateAuthToken(user._id, process.env.JWT_SECRET);
+      return res
+        .status(200)
+        .cookie("token", user.token, {
+          httpOnly: true,
+        })
+        .json({
+          success: true,
+          message: "Google auth successful",
+          user: {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            profilePhotoUrl: user.profilePhotoUrl,
+          },
+        });
+    }
+
+    const generatedPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcryptjs.hash(generatedPassword, 10);
+    const createdUser = await User.create({
+      username:
+        name.toLowerCase().split(" ").join("") +
+        Math.random().toString(36).slice(-4),
+      email,
+      password: hashedPassword,
+      profilePicture: profilePhotoUrl || "",
+    });
+
+    const token = generateAuthToken(createdUser._id, process.env.JWT_SECRET);
+
+    return res
+      .status(201)
+      .cookie("token", token, {
+        httpOnly: true,
+      })
+      .json({
+        success: true,
+        message: "Google auth successful",
+        user: {
+          id: createdUser._id,
+          username: createdUser.username,
+          email: createdUser.email,
+          profilePicture: profilePhotoUrl || "",
+        },
+        token,
+      });
+  } catch (error) {
+    console.error("Google Auth error:", error);
+    return next(errorHandler(500, "Internal server error during Google auth"));
+  }
+};
