@@ -18,6 +18,12 @@ import {
 import { Input } from "@/components/ui/input";
 
 import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInFailure,
+  signInStart,
+  signInSuccess,
+} from "@/redux/user/userSlice";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -27,8 +33,10 @@ const formSchema = z.object({
 });
 
 const SignInForm = () => {
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { currentUser, error, loading } = useSelector((state) => state.user);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -40,11 +48,14 @@ const SignInForm = () => {
 
   const onSubmit = async (values) => {
     try {
-      setLoading(true);
+      // setLoading(true);
+
+      dispatch(signInStart());
 
       const res = await axios.post("/auth/sign-in", values);
 
       if (res.status === 200) {
+        dispatch(signInSuccess(res.data));
         toast.success("Signin successful!");
         navigate("/");
       }
@@ -52,9 +63,8 @@ const SignInForm = () => {
       console.log(error);
       const message =
         error.response?.data?.message || "An error occurred during signin.";
+      dispatch(signInFailure(message));
       toast.error(message);
-    } finally {
-      setLoading(false);
     }
   };
 
