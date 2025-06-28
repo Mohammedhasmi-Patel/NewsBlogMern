@@ -6,6 +6,7 @@ import About from "./pages/About";
 import Dashboard from "./pages/Dashboard";
 import NewsArticles from "./pages/NewsArticles";
 import Header from "./components/shared/Header";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/news" element={<NewsArticles />} />
         <Route path="/" element={<Home />} />
       </Routes>
+      <Toaster position="top-right" reverseOrder={false} />
     </BrowserRouter>
   );
 }

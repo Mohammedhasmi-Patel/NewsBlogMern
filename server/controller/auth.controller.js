@@ -34,7 +34,9 @@ export const signup = async (req, res, next) => {
       password: hashedPassword,
     });
 
-    return res.status(201).json({ message: "User created successfully." });
+    return res
+      .status(201)
+      .json({ success: true, message: "User created successfully." });
   } catch (error) {
     console.error("Signup error:", error);
     return next(errorHandler(500, "Internal server error during signup"));
